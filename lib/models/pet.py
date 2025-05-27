@@ -1,5 +1,3 @@
-# lib/models/pet.py
-
 from lib.db.connection import CURSOR, CONN
 
 class Pet:
