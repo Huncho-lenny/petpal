@@ -8,7 +8,7 @@ class Pet:
     def __init__(self, name, pet_type, owner_id=None, id=None):
         self.id = id
         self.name = name
-        self.pet_type = pet_type  # validated in setter
+        self.pet_type = pet_type 
         self.owner_id = owner_id
         Pet.all.append(self)
 

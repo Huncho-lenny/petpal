@@ -1,5 +1,5 @@
 from lib.db.connection import CONN, CURSOR
-from lib.models.pet import Pet  # Avoid circular import issues if used later
+from lib.models.pet import Pet 
 
 class Owner:
     all = []
