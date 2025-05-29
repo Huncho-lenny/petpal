@@ -1,4 +1,4 @@
-from lib.db.connection import CURSOR, CONN
+from db.connection import CURSOR, CONN
 
 class Pet:
     VALID_TYPES = ['dog', 'cat', 'bird', 'fish', 'lizard', 'hamster']
@@ -35,6 +35,10 @@ class Pet:
             self.id = CURSOR.lastrowid
         CONN.commit()
 
+    def delete(self):
+        CURSOR.execute("DELETE FROM pets WHERE id = ?", (self.id,))
+        CONN.commit()
+
     @classmethod
     def instance_from_db(cls, row):
         id, name, pet_type, owner_id = row
@@ -46,6 +50,12 @@ class Pet:
         rows = CURSOR.fetchall()
         return [cls.instance_from_db(row) for row in rows]
 
+    @classmethod
+    def find_by_id(cls, id):
+        CURSOR.execute("SELECT * FROM pets WHERE id = ?", (id,))
+        row = CURSOR.fetchone()
+        return cls.instance_from_db(row) if row else None
+
     def owner(self):
-        from lib.models.owner import Owner
+        from models.owner import Owner
         return Owner.find_by_id(self.owner_id)

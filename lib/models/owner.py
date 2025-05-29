@@ -1,5 +1,5 @@
 from lib.db.connection import CONN, CURSOR
-from lib.models.pet import Pet 
+from lib.models.pet import Pet
 
 class Owner:
     all = []
@@ -12,6 +12,15 @@ class Owner:
     def __repr__(self):
         return f"<Owner {self.id}: {self.name}>"
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("Owner name must be a non-empty string.")
+        self._name = value.strip()
 
     def save(self):
         if self.id:
@@ -21,18 +30,16 @@ class Owner:
             self.id = CURSOR.lastrowid
         CONN.commit()
 
-
     def pets(self):
-        from lib.models.pet import Pet
         CURSOR.execute("SELECT * FROM pets WHERE owner_id = ?", (self.id,))
         rows = CURSOR.fetchall()
         return [Pet.instance_from_db(row) for row in rows]
 
-
     def add_pet(self, pet):
+        if not isinstance(pet, Pet):
+            raise TypeError("Expected a Pet instance.")
         pet.owner_id = self.id
         pet.save()
-
 
     @staticmethod
     def find_by_id(owner_id):
@@ -40,6 +47,10 @@ class Owner:
         row = CURSOR.fetchone()
         return Owner.instance_from_db(row) if row else None
 
+    @classmethod
+    def get_all(cls):
+        CURSOR.execute("SELECT * FROM owners")
+        return [cls.instance_from_db(row) for row in CURSOR.fetchall()]
 
     @classmethod
     def instance_from_db(cls, row):

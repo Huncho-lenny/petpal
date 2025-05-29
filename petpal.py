@@ -1,6 +1,5 @@
 from models.owner import Owner
 from models.pet import Pet
-from db.connection import get_db_connection
 
 def create_owner(name):
     owner = Owner(name=name)
