@@ -1,101 +1,92 @@
+from lib.db.connection import CONN, CURSOR
 import sqlite3
-from models.owner import Owner
-from models.pet import Pet
 
-CONN = sqlite3.connect('petpal.db', check_same_thread=False)
+CONN = sqlite3.connect('lib/db/petpal.db')
 CURSOR = CONN.cursor()
 
+from lib.models.owner import Owner
+from lib.models.pet import Pet
+
+Owner.CONN = CONN
+Owner.CURSOR = CURSOR
+Pet.CONN = CONN
+Pet.CURSOR = CURSOR
+
+def menu():
+    print("\nPetPal Menu")
+    print("1. Add Owner")
+    print("2. Add Pet")
+    print("3. Show Pets for an Owner")
+    print("4. Exit")
+
 def add_owner():
-    name = input("Enter owner's name: ").strip()
-    if not name:
-        print("Error: Owner name cannot be empty!")
-        return
-        
+    name = input("Enter owner's name: ")
     owner = Owner(name)
-    try:
-        owner.save(CURSOR)
-        CONN.commit()
-        print(f"Owner '{name}' added successfully!")
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        CONN.rollback()
+    owner.save()
+    print(f"Owner '{owner.name}' added with ID {owner.id}.")
 
 def add_pet():
-    try:
-        owner_id = int(input("Enter owner ID: "))
-        owner = Owner.find_by_id(owner_id, CURSOR)
-        if not owner:
-            print(f"No owner found with ID {owner_id}")
-            return
-            
-        name = input("Enter pet's name: ").strip()
-        breed = input("Enter pet's breed: ").strip()
-        age = int(input("Enter pet's age: "))
-        
-        if not name or not breed:
-            print("Error: Name and breed cannot be empty!")
-            return
-            
-        pet = Pet(name, breed, age, owner_id)
-        pet.save(CURSOR)
-        CONN.commit()
-        print(f"Pet '{name}' added to owner '{owner.name}'!")
-    except ValueError:
-        print("Invalid input! Please enter numbers for ID and age.")
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        CONN.rollback()
+    name = input("Enter pet's name: ")
+    pet_type = input("Enter pet type: ")
+    owner_id = input("Enter owner ID: ")
 
-def show_pets():
     try:
-        owner_id = int(input("Enter owner ID: "))
-        owner = Owner.find_by_id(owner_id, CURSOR)
-        if not owner:
-            print(f"No owner found with ID {owner_id}")
-            return
-            
-        pets = Pet.get_by_owner(owner_id, CURSOR)
-        if not pets:
-            print(f"No pets found for owner '{owner.name}'")
-            return
-            
-        print(f"\nPets for {owner.name}:")
-        for pet in pets:
-            print(f"  - {pet.name} ({pet.breed}), {pet.age} years old")
+        owner = Owner.find_by_id(int(owner_id))
     except ValueError:
-        print("Invalid input! Please enter a number for ID.")
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print("Invalid ID format.")
+        return
+
+    if not owner:
+        print("Owner not found.")
+        return
+    
+    pet = Pet(name=name, pet_type=pet_type, owner_id=owner.id)
+    pet.save()
+    print(f"Pet '{pet.name}' added for Owner '{owner.name}'.")
+
+def show_pets_for_owner():
+    owner_id = input("Enter owner ID: ")
+
+    try:
+        owner = Owner.find_by_id(int(owner_id))
+    except ValueError:
+        print("Invalid ID format.")
+        return
+
+    if not owner:
+        print("Owner not found.")
+        return
+
+    pets = owner.pets()
+    if pets:
+        print(f"Pets for {owner.name}:")
+        for pet in pets:
+            print(f"- {pet.name} ({pet.pet_type})")
+    else:
+        print(f"{owner.name} has no pets yet.")
 
 def run():
-    print("Welcome to PetPal!")
-    
-    menu_options = {
-        "1": ("Add Owner", add_owner),
-        "2": ("Add Pet", add_pet),
-        "3": ("Show Pets for Owner", show_pets),
-        "4": ("Exit", None)
-    }
-    
     while True:
-        print("\n" + "="*20)
-        print("PetPal Menu")
-        for key, (text, _) in menu_options.items():
-            print(f"{key}. {text}")
-        
-        choice = input("Choose an option: ").strip()
-        
-        if choice == "4":
-            print("\nThank you for using PetPal! Goodbye!")
+        print("\nPetPal Menu")
+        print("1. Add Owner")
+        print("2. Add Pet")
+        print("3. Show Pets for an Owner")
+        print("4. Exit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            add_owner()
+        elif choice == "2":
+            add_pet()
+        elif choice == "3":
+            show_pets_for_owner()
+        elif choice == "4":
+            print("Goodbye!")
+            CONN.close()
             break
-            
-        if choice in menu_options:
-            menu_options[choice][1]()
         else:
-            print("Invalid option. Please choose 1-4")
+            print("Invalid choice.")
 
 if __name__ == "__main__":
-    try:
-        run()
-    finally:
-        CONN.close()
+    run()
