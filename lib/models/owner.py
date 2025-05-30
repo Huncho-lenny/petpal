@@ -1,3 +1,4 @@
+from lib.db import CURSOR, CONN
 from lib.db.connection import CONN, CURSOR
 from lib.models.pet import Pet
 

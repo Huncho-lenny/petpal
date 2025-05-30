@@ -1,3 +1,4 @@
+from lib.db import CONN, CURSOR
 from lib.models.owner import Owner
 from lib.models.pet import Pet
 
@@ -58,7 +59,6 @@ def run():
     while True:
         menu()
         choice = input("Choose an option: ")
-
         if choice == "1":
             add_owner()
         elif choice == "2":
@@ -66,7 +66,8 @@ def run():
         elif choice == "3":
             show_pets_for_owner()
         elif choice == "4":
-            print("Goodbye!")
+            print("Exiting PetPal...")
+            CONN.close()  
             break
         else:
             print("Invalid choice. Try again.")
