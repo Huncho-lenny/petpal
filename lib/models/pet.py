@@ -8,6 +8,33 @@ class Pet:
 
     all = []
 
+    def __init__(self, name, breed, age, owner_id, id=None):
+        self.name = name
+        self.breed = breed
+        self.age = age
+        self.owner_id = owner_id
+        self.id = id
+        Pet.all.append(self)
+
+    def save(self, cursor):
+        if self.id is None:
+            cursor.execute(
+                "INSERT INTO pets (name, breed, age, owner_id) VALUES (?, ?, ?, ?)",
+                (self.name, self.breed, self.age, self.owner_id)
+            )
+            self.id = cursor.lastrowid
+        else:
+            cursor.execute(
+                "UPDATE pets SET name=?, breed=?, age=?, owner_id=? WHERE id=?",
+                (self.name, self.breed, self.age, self.owner_id, self.id)
+            )
+
+    @classmethod
+    def get_by_owner(cls, owner_id, cursor):
+        cursor.execute("SELECT * FROM pets WHERE owner_id = ?", (owner_id,))
+        rows = cursor.fetchall()
+        return [cls(row[1], row[2], row[3], row[4], row[0]) for row in rows]
+
     def __init__(self, name, pet_type, owner_id=None, id=None):
         self.id = id
         self.name = name

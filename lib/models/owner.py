@@ -2,13 +2,30 @@ from lib.db.connection import CONN, CURSOR
 from lib.models.pet import Pet
 
 class Owner:
-    all = []
-
     def __init__(self, name, id=None):
-        self.id = id
         self.name = name
-        Owner.all.append(self)
+        self.id = id
 
+    def save(self, cursor=CURSOR):
+        if self.id is None:
+            cursor.execute(
+                "INSERT INTO owners (name) VALUES (?)",
+                (self.name,)
+            )
+            self.id = cursor.lastrowid
+            CONN.commit()
+        else:
+            cursor.execute(
+                "UPDATE owners SET name = ? WHERE id = ?",
+                (self.name, self.id)
+            )
+            CONN.commit()
+
+    @classmethod
+    def find_by_id(cls, owner_id, cursor=CURSOR):
+        cursor.execute("SELECT * FROM owners WHERE id = ?", (owner_id,))
+        row = cursor.fetchone()
+        return cls(row[1], row[0]) if row else None
     def __repr__(self):
         return f"<Owner {self.id}: {self.name}>"
 
