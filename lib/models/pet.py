@@ -1,4 +1,4 @@
-from db.connection import CURSOR, CONN
+from lib.db.connection import CURSOR, CONN
 
 class Pet:
     VALID_TYPES = ['dog', 'cat', 'bird', 'fish', 'lizard', 'hamster']

@@ -1,19 +1,19 @@
 import sqlite3
 
-connection = sqlite3.connect('petpal.db')
-cursor = connection.cursor()
+CONN = sqlite3.connect('petpal.db')
+CURSOR = CONN.cursor()
 
-cursor.execute("DROP TABLE IF EXISTS owners;")
-cursor.execute("DROP TABLE IF EXISTS pets;")
+CURSOR.execute("DROP TABLE IF EXISTS owners;")
+CURSOR.execute("DROP TABLE IF EXISTS pets;")
 
-cursor.execute("""
+CURSOR.execute("""
 CREATE TABLE owners (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL
 );
 """)
 
-cursor.execute("""
+CURSOR.execute("""
 CREATE TABLE pets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -23,5 +23,5 @@ CREATE TABLE pets (
 );
 """)
 
-connection.commit()
-connection.close()
+CONN.commit()
+CONN.close()
