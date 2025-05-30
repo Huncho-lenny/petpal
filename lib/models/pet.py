@@ -1,7 +1,9 @@
-from lib.db import CURSOR, CONN
 from lib.db.connection import CURSOR, CONN
 
 class Pet:
+    CONN = None
+    CURSOR = None
+
     VALID_TYPES = ['dog', 'cat', 'bird', 'fish', 'lizard', 'hamster']
 
     all = []

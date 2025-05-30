@@ -1,6 +1,16 @@
-from lib.db import CONN, CURSOR
+from lib.db.connection import CONN, CURSOR
+import sqlite3
+
+CONN = sqlite3.connect('lib/db/petpal.db')
+CURSOR = CONN.cursor()
+
 from lib.models.owner import Owner
 from lib.models.pet import Pet
+
+Owner.CONN = CONN
+Owner.CURSOR = CURSOR
+Pet.CONN = CONN
+Pet.CURSOR = CURSOR
 
 def menu():
     print("\nPetPal Menu")
@@ -57,8 +67,14 @@ def show_pets_for_owner():
 
 def run():
     while True:
-        menu()
+        print("\nPetPal Menu")
+        print("1. Add Owner")
+        print("2. Add Pet")
+        print("3. Show Pets for an Owner")
+        print("4. Exit")
+
         choice = input("Choose an option: ")
+
         if choice == "1":
             add_owner()
         elif choice == "2":
@@ -66,11 +82,11 @@ def run():
         elif choice == "3":
             show_pets_for_owner()
         elif choice == "4":
-            print("Exiting PetPal...")
-            CONN.close()  
+            print("Goodbye!")
+            CONN.close()
             break
         else:
-            print("Invalid choice. Try again.")
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     run()

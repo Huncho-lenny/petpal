@@ -1,4 +1,3 @@
-from lib.db import CURSOR, CONN
 from lib.db.connection import CONN, CURSOR
 from lib.models.pet import Pet
 
@@ -26,10 +25,11 @@ class Owner:
     def save(self):
         if self.id:
             CURSOR.execute("UPDATE owners SET name = ? WHERE id = ?", (self.name, self.id))
+            CONN.commit()
         else:
             CURSOR.execute("INSERT INTO owners (name) VALUES (?)", (self.name,))
             self.id = CURSOR.lastrowid
-        CONN.commit()
+            CONN.commit()
 
     def pets(self):
         CURSOR.execute("SELECT * FROM pets WHERE owner_id = ?", (self.id,))
