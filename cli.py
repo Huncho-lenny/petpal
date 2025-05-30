@@ -1,9 +1,4 @@
 from lib.db.connection import CONN, CURSOR
-import sqlite3
-
-CONN = sqlite3.connect('lib/db/petpal.db')
-CURSOR = CONN.cursor()
-
 from lib.models.owner import Owner
 from lib.models.pet import Pet
 
@@ -11,6 +6,7 @@ Owner.CONN = CONN
 Owner.CURSOR = CURSOR
 Pet.CONN = CONN
 Pet.CURSOR = CURSOR
+
 
 def menu():
     print("\nPetPal Menu")
@@ -87,6 +83,8 @@ def run():
             break
         else:
             print("Invalid choice.")
+
+    CONN.close()    
 
 if __name__ == "__main__":
     run()
